@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NavBar } from "@/components/NavBar";
 import { EditPatientModal } from "@/components/EditPatientModal";
-import { Users, Plus, Search, AlertTriangle, ChevronRight, FileText, Edit3 } from "lucide-react";
+import { Users, Plus, Search, AlertTriangle, ChevronRight, FileText, Edit3, Shield } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 
 interface PatientSummary {
@@ -81,19 +81,33 @@ export default function DashboardPage() {
               {loading ? "Loading…" : `${total} patient${total !== 1 ? "s" : ""} on record`}
             </p>
           </div>
-          <Link
-            href="/patients/new"
-            prefetch={true}
-            className={cn(
-              "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl",
-              "bg-accent text-white text-sm font-semibold shadow-xs",
-              "hover:bg-accent-hover hover:shadow-sm transition-all active:scale-95",
-              "focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
-            )}
-          >
-            <Plus className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
-            New Patient
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin"
+              prefetch={true}
+              className={cn(
+                "inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-line bg-surface text-ink text-sm font-semibold shadow-2xs",
+                "hover:bg-cream-100 hover:border-accent/40 transition-all active:scale-95",
+                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+              )}
+            >
+              <Shield className="h-4 w-4 text-accent" aria-hidden="true" />
+              <span>Admin Console</span>
+            </Link>
+            <Link
+              href="/patients/new"
+              prefetch={true}
+              className={cn(
+                "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl",
+                "bg-accent text-white text-sm font-semibold shadow-xs",
+                "hover:bg-accent-hover hover:shadow-sm transition-all active:scale-95",
+                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2"
+              )}
+            >
+              <Plus className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
+              <span>New Patient</span>
+            </Link>
+          </div>
         </div>
 
         {/* Search */}

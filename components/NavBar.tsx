@@ -32,7 +32,7 @@ export function NavBar() {
             <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-xs border border-line/60 group-hover:scale-105 transition-all">
               <Image
                 src="/logo.jpg"
-                alt="MedLens Premium Logo"
+                alt="MedLens Logo"
                 width={40}
                 height={40}
                 priority
