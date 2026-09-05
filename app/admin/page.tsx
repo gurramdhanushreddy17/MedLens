@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState, useCallback } from "react";
 import { NavBar } from "@/components/NavBar";
 import { EditPatientModal } from "@/components/EditPatientModal";
