@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id              String   @id @default(cuid())
+  name            String
+  age             Int
+  sex             String
+  dateOfBirth     DateTime?
+  contactInfo     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String
+  profileEntries  PatientProfileEntry[]
+  reports         MedicalReport[]
+  labResults      LabResult[]
+  summaries       AISummary[]
+  inconsistencies InconsistencyFlag[]
+  auditLogs       AuditLog[]
+}
+
+model PatientProfileEntry {
+  id        String   @id @default(cuid())
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  category  String   // symptom | existing_condition | allergy | medication | other
+  value     String
+  notes     String?
+  source    String   @default("user-entered")
+  enteredBy String
+  enteredAt DateTime @default(now())
+}
+
+model MedicalReport {
+  id               String    @id @default(cuid())
+  patientId        String
+  patient          Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  filePath         String
+  fileType         String
+  originalFilename String
+  reportDate       DateTime?
+  uploadedBy       String
+  uploadedAt       DateTime  @default(now())
+  processingStatus String    @default("pending") // pending | processing | processed | failed | needs_review
+  rawExtractedText String?
+  labResults       LabResult[]
+}
+
+model LabResult {
+  id                  String        @id @default(cuid())
+  reportId            String
+  report              MedicalReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  patientId           String
+  patient             Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  testName            String
+  value               String
+  unit                String?
+  referenceRangeLow   Float?
+  referenceRangeHigh  Float?
+  referenceRangeRaw   String?
+  flag                String        @default("unknown") // low | normal | high | unknown
+  observationNote     String?
+  source              String        @default("ai-extracted")
+  confidence          Float
+  verifiedByClinician Boolean       @default(false)
+  verifiedBy          String?
+  verifiedAt          DateTime?
+}
+
+model AISummary {
+  id               String   @id @default(cuid())
+  patientId        String
+  patient          Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  summaryText      String
+  generatedAt      DateTime @default(now())
+  modelVersion     String
+  source           String   @default("ai-generated")
+  basedOnReportIds String[]
+  disclaimerShown  Boolean  @default(true)
+}
+
+model InconsistencyFlag {
+  id                  String   @id @default(cuid())
+  patientId           String
+  patient             Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  type                String   // value_conflict | date_conflict | missing_range | duplicate_test
+  description         String
+  relatedLabResultIds String[]
+  resolved            Boolean  @default(false)
+  resolvedBy          String?
+  resolvedAt          DateTime?
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  patientId  String
+  patient    Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  actorId    String
+  action     String
+  entityType String
+  entityId   String
+  timestamp  DateTime @default(now())
+  details    Json?
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("clinician") // clinician | admin
+  createdAt    DateTime @default(now())
+}

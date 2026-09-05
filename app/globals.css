@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties ───────────────────────────────────────────────── */
+:root {
+  --ink: #1C1917;
+  --paper: #FAF7F2;
+  --surface: #FFFFFF;
+  --line: #E7E2D9;
+  --accent: #E05A2B;
+  --accent-hover: #C84B1F;
+  --flag-high: #DC2626;
+  --flag-low: #D97706;
+  --flag-normal: #15803D;
+  --ai-generated: #7C3AED;
+}
+
+/* ─── Base Styles ─────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-line;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans text-sm;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+
+  /* Visible keyboard focus rings in --accent */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--paper);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #B5BEBB;
+  }
+}
+
+/* ─── Component Utilities ─────────────────────────────────────────────────── */
+@layer utilities {
+  /* Provenance left borders */
+  .provenance-ai-extracted {
+    border-left: 2px solid var(--accent);
+  }
+  .provenance-ai-generated {
+    border-left: 2px solid var(--ai-generated);
+  }
+  .provenance-user-entered {
+    border-left: 2px solid transparent;
+  }
+
+  /* Lab value monospace */
+  .lab-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Flag dot */
+  .flag-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .flag-dot-high { background-color: var(--flag-high); }
+  .flag-dot-low { background-color: var(--flag-low); }
+  .flag-dot-normal { background-color: var(--flag-normal); }
+  .flag-dot-unknown { background-color: #B5BEBB; }
+
+  /* Section dividers */
+  .section-divider {
+    border-top: 1px solid var(--line);
+    margin-top: 2rem;
+    padding-top: 2rem;
+  }
+
+  /* Smooth click interactions & luxury shadows */
+  .card-hover {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -2px rgba(28, 25, 23, 0.06), 0 2px 6px -1px rgba(28, 25, 23, 0.04);
+  }
+
+  /* Keyframe animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Prefers reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ─── Print Styles ────────────────────────────────────────────────────────── */
+@media print {
+  body {
+    background: white;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
