@@ -11,7 +11,6 @@ async function main() {
 
   // ── Users ──────────────────────────────────────────────────────────────────
   const adminHash = await bcrypt.hash("Admin2025!", 12);
-  const clinicianHash = await bcrypt.hash("MedLens2025!", 12);
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@medlens.dev" },
@@ -24,16 +23,8 @@ async function main() {
     },
   });
 
-  const clinician = await prisma.user.upsert({
-    where: { email: "dr.chen@medlens.dev" },
-    update: {},
-    create: {
-      name: "Dr. Wei Chen",
-      email: "dr.chen@medlens.dev",
-      passwordHash: clinicianHash,
-      role: "clinician",
-    },
-  });
+  const seedUser = admin;
+  const clinician = seedUser;
 
   console.log("  ✓ Users created");
 

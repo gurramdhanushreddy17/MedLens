@@ -5,7 +5,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      role: "clinician" | "admin";
+      role: "admin";
       name?: string | null;
       email?: string | null;
       image?: string | null;
@@ -14,13 +14,13 @@ declare module "next-auth" {
 
   interface User extends DefaultUser {
     id: string;
-    role: "clinician" | "admin";
+    role: "admin";
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
     id: string;
-    role: "clinician" | "admin";
+    role: "admin";
   }
 }

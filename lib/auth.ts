@@ -40,7 +40,7 @@ export async function requireAdmin(): Promise<
 
 /**
  * Check if the session user can access a patient's record.
- * Admin can access all patients; clinician only their own.
+ * Administrators can access all patients.
  */
 export async function canAccessPatient(
   _req: NextRequest,

@@ -117,6 +117,6 @@ model User {
   name         String
   email        String   @unique
   passwordHash String
-  role         String   @default("clinician") // clinician | admin
+  role         String   @default("admin") // admin only
   createdAt    DateTime @default(now())
 }

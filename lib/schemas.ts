@@ -9,7 +9,7 @@ export const FLAG_VALUES = ["low", "normal", "high", "unknown"] as const;
 export type Flag = (typeof FLAG_VALUES)[number];
 
 // ─── Role Values ──────────────────────────────────────────────────────────────
-export const ROLE_VALUES = ["clinician", "admin"] as const;
+export const ROLE_VALUES = ["admin"] as const;
 export type Role = (typeof ROLE_VALUES)[number];
 
 // ─── Processing Status Values ─────────────────────────────────────────────────

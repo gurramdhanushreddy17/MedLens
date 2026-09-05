@@ -23,7 +23,7 @@ MedLens is a full-stack clinical intelligence web application that consolidates 
 - **Styling**: Tailwind CSS with custom clinical design tokens (`ink`, `paper`, `surface`, `line`, `accent`, `flag-high`, `flag-low`, `flag-normal`, `ai-generated`)
 - **Typography**: Source Serif 4 (Headings), Inter (UI), IBM Plex Mono (Lab Values & Numbers)
 - **Database & ORM**: PostgreSQL via Prisma 5.22.0
-- **Authentication**: NextAuth.js (Credentials Provider with bcryptjs, role-based access for `clinician` and `admin`)
+- **Authentication**: NextAuth.js (Credentials Provider with bcryptjs, administrator-only access)
 - **LLM Integration**: Google Gemini 2.5 Flash via official `@google/genai` SDK (server-side only, strict JSON mode & validation)
 - **Document Processing**: `pdf-parse` for text PDFs, `tesseract.js` WASM OCR fallback for scanned images
 - **Export**: `@react-pdf/renderer` for standardized PDF reports
