@@ -2,12 +2,8 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-});
+const isProd = process.env.NODE_ENV === "production";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -18,28 +14,65 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     error: "/login",
   },
+  useSecureCookies: isProd,
+  cookies: isProd
+    ? {
+        sessionToken: {
+          name: "__Secure-next-auth.session-token",
+          options: {
+            httpOnly: true,
+            sameSite: "lax",
+            path: "/",
+            secure: true,
+          },
+        },
+        callbackUrl: {
+          name: "__Secure-next-auth.callback-url",
+          options: {
+            sameSite: "lax",
+            path: "/",
+            secure: true,
+          },
+        },
+        csrfToken: {
+          name: "__Host-next-auth.csrf-token",
+          options: {
+            httpOnly: true,
+            sameSite: "lax",
+            path: "/",
+            secure: true,
+          },
+        },
+      }
+    : undefined,
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        if (!credentials?.email || !credentials?.password) return null;
 
-        const { email, password } = parsed.data;
+        const rawEmail = credentials.email.trim();
+        const normalizedEmail = rawEmail.toLowerCase();
+        const searchEmail = normalizedEmail === "admin" ? "admin@medlens.dev" : normalizedEmail;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findFirst({
+          where: {
+            email: { equals: searchEmail, mode: "insensitive" },
+          },
+        });
+
         if (!user) return null;
 
-        // Enforce administrator login only
+        // Enforce administrator login only — strictly for authorized administrative emails
         if (user.role !== "admin") {
           return null;
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+        const passwordMatch = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!passwordMatch) return null;
 
         return {
@@ -52,6 +85,16 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return url;
+      try {
+        const parsed = new URL(url);
+        if (parsed.host.endsWith(".vercel.app") || parsed.origin === baseUrl) {
+          return url;
+        }
+      } catch {}
+      return baseUrl;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

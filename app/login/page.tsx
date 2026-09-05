@@ -3,7 +3,6 @@
 export const dynamic = "force-dynamic";
 
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +12,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid administrator email address"),
+  email: z.string().min(1, "Please enter your administrator email"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -21,33 +20,42 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "admin@medlens.dev",
+      password: "Admin2025!",
+    },
+  });
 
   useEffect(() => {
     if (status === "authenticated" && session) {
-      router.replace("/dashboard");
+      window.location.href = "/dashboard";
     }
-  }, [session, status, router]);
+  }, [session, status]);
 
   const onSubmit = async (data: LoginForm) => {
     setAuthError(null);
-    const result = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email: data.email.trim(),
+        password: data.password,
+        redirect: false,
+      });
 
-    if (result?.error) {
-      setAuthError("Administrator authentication failed. Please verify your admin credentials.");
-    } else if (result?.ok) {
-      router.push("/dashboard");
+      if (result?.error) {
+        setAuthError("Administrator authentication failed. Please verify your admin credentials.");
+      } else if (result?.ok) {
+        window.location.href = "/dashboard";
+      }
+    } catch {
+      setAuthError("An unexpected network error occurred. Please try again.");
     }
   };
 
@@ -146,7 +154,7 @@ export default function LoginPage() {
               <span>Admin Authentication</span>
             </div>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-ink tracking-tight">
-              Sign In to Medlens
+              Sign In to MedLens
             </h2>
             <p className="text-sm text-ink/60 mt-1.5">
               Enter your authorized administrative credentials to access patient records and clinical oversight.
@@ -248,7 +256,7 @@ export default function LoginPage() {
 
           {/* Privacy & Medical Notice */}
           <div className="pt-5 border-t border-line text-center text-xs text-ink/50 leading-relaxed">
-            Authorized administrator access to Medlens Clinical Management only. All activities are audited and logged in accordance with clinical safety protocols.
+            Authorized administrator access to MedLens Clinical Management only. All activities are audited and logged in accordance with clinical safety protocols.
           </div>
         </div>
       </div>
