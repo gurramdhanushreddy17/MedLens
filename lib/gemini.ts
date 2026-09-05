@@ -105,6 +105,13 @@ const CLARIFICATION_SYSTEM_PROMPT = `Given the following incomplete or ambiguous
 
 // ─── API Functions ────────────────────────────────────────────────────────────
 
+export function cleanJsonText(text: string): string {
+  return text
+    .replace(/^```(?:json)?\n?/m, "")
+    .replace(/\n?```$/m, "")
+    .trim();
+}
+
 /**
  * Extract structured lab results from raw report text using Gemini.
  */
@@ -120,10 +127,7 @@ export async function extractLabResults(rawText: string) {
   const text = response.text?.trim() || "";
   let parsed: unknown;
   try {
-    const cleaned = text
-      .replace(/^```(?:json)?\n?/m, "")
-      .replace(/\n?```$/m, "")
-      .trim();
+    const cleaned = cleanJsonText(text);
     parsed = JSON.parse(cleaned);
   } catch {
     throw new Error(`Gemini returned invalid JSON: ${text.slice(0, 200)}`);
@@ -311,7 +315,7 @@ function buildSummaryUserContent(input: SummaryInput): string {
   return lines.join("\n");
 }
 
-function buildFallbackSummary(input: SummaryInput): string {
+export function buildFallbackSummary(input: SummaryInput): string {
   const highLow = input.labResults.filter(
     (lr) => lr.flag === "high" || lr.flag === "low"
   );

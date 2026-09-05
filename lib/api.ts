@@ -14,10 +14,21 @@ export type ApiError = {
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;
 
+/**
+ * Constructs a standardized successful API response envelope.
+ * @param data The payload to return in `data`
+ * @param status HTTP response code (defaults to 200)
+ */
 export function ok<T>(data: T, status = 200): NextResponse<ApiSuccess<T>> {
   return NextResponse.json({ success: true, data }, { status });
 }
 
+/**
+ * Constructs a standardized client error response envelope.
+ * @param message Human-readable error explanation
+ * @param status HTTP client error code (defaults to 400)
+ * @param details Optional structured error metadata
+ */
 export function err(
   message: string,
   status = 400,
@@ -26,6 +37,10 @@ export function err(
   return NextResponse.json({ success: false, error: message, details }, { status });
 }
 
+/**
+ * Transforms Zod schema validation errors into a formatted 422 Unprocessable Entity response.
+ * @param error The ZodError containing field-level issues
+ */
 export function zodErr(error: ZodError): NextResponse<ApiError> {
   return NextResponse.json(
     {
@@ -37,6 +52,10 @@ export function zodErr(error: ZodError): NextResponse<ApiError> {
   );
 }
 
+/**
+ * Handles unexpected server errors gracefully with a 500 status code and diagnostic logging.
+ * @param e The caught error or exception
+ */
 export function serverErr(e: unknown): NextResponse<ApiError> {
   console.error("[API Error]", e);
   const message =

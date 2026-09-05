@@ -5,8 +5,13 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import nextDynamic from "next/dynamic";
 import { NavBar } from "@/components/NavBar";
-import { EditPatientModal } from "@/components/EditPatientModal";
+
+const EditPatientModal = nextDynamic(
+  () => import("@/components/EditPatientModal").then((mod) => mod.EditPatientModal),
+  { ssr: false }
+);
 import { Users, Plus, Search, AlertTriangle, ChevronRight, FileText, Edit3, Shield } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 
@@ -42,6 +47,8 @@ export default function DashboardPage() {
     contactInfo: string | null;
   } | null>(null);
 
+  const initialMountRef = useState({ mounted: false })[0];
+
   const fetchPatients = useCallback(async (isInitial = false) => {
     if (isInitial) setLoading(true);
     setError(null);
@@ -63,11 +70,13 @@ export default function DashboardPage() {
   }, [search, page]);
 
   useEffect(() => {
+    const isFirst = !initialMountRef.mounted;
+    initialMountRef.mounted = true;
     const timer = setTimeout(() => {
-      fetchPatients(patients.length === 0);
-    }, search ? 200 : 0);
+      fetchPatients(isFirst);
+    }, search ? 250 : 0);
     return () => clearTimeout(timer);
-  }, [fetchPatients, search, patients.length]);
+  }, [fetchPatients, search, initialMountRef]);
 
   return (
     <div className="min-h-screen bg-paper">

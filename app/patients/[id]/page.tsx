@@ -3,16 +3,32 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { NavBar } from "@/components/NavBar";
 import { LabResultRow } from "@/components/LabResultRow";
 import { SummaryCard } from "@/components/SummaryCard";
 import { ConflictBanner } from "@/components/ConflictBanner";
 import { TimelineView } from "@/components/TimelineView";
-import { TrendChart } from "@/components/TrendChart";
 import { ClarificationPrompt } from "@/components/ClarificationPrompt";
 import { ReportUpload } from "@/components/ReportUpload";
 import { SourceBorder } from "@/components/SourceBorder";
-import { EditPatientModal } from "@/components/EditPatientModal";
+
+const TrendChart = dynamic(
+  () => import("@/components/TrendChart").then((mod) => mod.TrendChart),
+  {
+    loading: () => (
+      <div className="h-40 rounded-xl bg-surface/50 border border-line/50 flex items-center justify-center text-xs text-ink/40 animate-pulse">
+        Loading clinical trend chart…
+      </div>
+    ),
+    ssr: false,
+  }
+);
+
+const EditPatientModal = dynamic(
+  () => import("@/components/EditPatientModal").then((mod) => mod.EditPatientModal),
+  { ssr: false }
+);
 import {
   ArrowLeft, Download, User, AlertTriangle, Activity,
   Clock, Eye, EyeOff, Loader2, FileText, Plus, Edit3

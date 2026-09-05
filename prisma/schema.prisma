@@ -27,6 +27,11 @@ model Patient {
   summaries       AISummary[]
   inconsistencies InconsistencyFlag[]
   auditLogs       AuditLog[]
+
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([name])
+  @@index([createdBy])
 }
 
 model PatientProfileEntry {
@@ -39,6 +44,10 @@ model PatientProfileEntry {
   source    String   @default("user-entered")
   enteredBy String
   enteredAt DateTime @default(now())
+
+  @@index([patientId])
+  @@index([category])
+  @@index([patientId, category])
 }
 
 model MedicalReport {
@@ -54,6 +63,11 @@ model MedicalReport {
   processingStatus String    @default("pending") // pending | processing | processed | failed | needs_review
   rawExtractedText String?
   labResults       LabResult[]
+
+  @@index([patientId])
+  @@index([processingStatus])
+  @@index([uploadedAt])
+  @@index([patientId, processingStatus])
 }
 
 model LabResult {
@@ -75,6 +89,13 @@ model LabResult {
   verifiedByClinician Boolean       @default(false)
   verifiedBy          String?
   verifiedAt          DateTime?
+
+  @@index([patientId])
+  @@index([reportId])
+  @@index([testName])
+  @@index([flag])
+  @@index([verifiedByClinician])
+  @@index([patientId, testName])
 }
 
 model AISummary {
@@ -87,6 +108,9 @@ model AISummary {
   source           String   @default("ai-generated")
   basedOnReportIds String[]
   disclaimerShown  Boolean  @default(true)
+
+  @@index([patientId])
+  @@index([generatedAt])
 }
 
 model InconsistencyFlag {
@@ -99,6 +123,11 @@ model InconsistencyFlag {
   resolved            Boolean  @default(false)
   resolvedBy          String?
   resolvedAt          DateTime?
+
+  @@index([patientId])
+  @@index([resolved])
+  @@index([type])
+  @@index([patientId, resolved])
 }
 
 model AuditLog {
@@ -111,6 +140,12 @@ model AuditLog {
   entityId   String
   timestamp  DateTime @default(now())
   details    Json?
+
+  @@index([patientId])
+  @@index([timestamp])
+  @@index([action])
+  @@index([actorId])
+  @@index([patientId, timestamp])
 }
 
 model User {
@@ -120,4 +155,7 @@ model User {
   passwordHash String
   role         String   @default("admin") // admin only
   createdAt    DateTime @default(now())
+
+  @@index([email])
+  @@index([role])
 }
